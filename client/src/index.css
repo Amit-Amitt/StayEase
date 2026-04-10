@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 198 100% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --primary: 178 71% 34%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 91%;
+  --accent: 37 95% 92%;
+  --success: 160 84% 39%;
+  --warning: 27 96% 61%;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 96%;
+  --card: 222 44% 15%;
+  --primary: 173 80% 40%;
+  --primary-foreground: 222 47% 11%;
+  --muted: 217 33% 20%;
+  --muted-foreground: 215 20% 70%;
+  --border: 216 28% 24%;
+  --accent: 25 95% 25%;
+  --success: 160 84% 39%;
+  --warning: 27 96% 61%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background font-sans text-foreground antialiased;
+}
+
+a {
+  @apply text-inherit no-underline;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.page-shell {
+  @apply min-h-screen bg-[radial-gradient(circle_at_top,_rgba(13,148,136,0.12),_transparent_30%),linear-gradient(180deg,#f8fdff_0%,#eff7fb_100%)];
+}
+
+.dark .page-shell {
+  @apply bg-[radial-gradient(circle_at_top,_rgba(13,148,136,0.22),_transparent_30%),linear-gradient(180deg,#08111f_0%,#101828_100%)];
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
+}

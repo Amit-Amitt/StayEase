@@ -1,0 +1,167 @@
+export const hotels = [
+  {
+    id: 'azure-bay',
+    name: 'Azure Bay Retreat',
+    location: 'Goa, India',
+    city: 'Goa',
+    rating: 4.8,
+    reviewsCount: 312,
+    pricePerNight: 189,
+    description: 'Oceanfront suites with slow mornings, private balconies, and warm coastal service.',
+    longDescription:
+      'Azure Bay Retreat blends contemporary rooms, a breezy beach club, and thoughtfully curated local experiences for couples, families, and remote workers.',
+    amenities: ['Pool', 'Spa', 'WiFi', 'Breakfast', 'Beachfront'],
+    images: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80',
+    ],
+    featured: true,
+    stars: 5,
+    roomTypes: [
+      {
+        id: 'deluxe-suite',
+        name: 'Deluxe Suite',
+        description: 'Sea view suite with lounge area and private deck.',
+        beds: '1 King Bed',
+        capacity: 2,
+        price: 189,
+      },
+      {
+        id: 'family-villa',
+        name: 'Family Villa',
+        description: 'Spacious villa with two bedrooms and kitchenette.',
+        beds: '2 Queen Beds',
+        capacity: 4,
+        price: 289,
+      },
+    ],
+    reviews: [
+      { id: 'r1', user: 'Anaya', comment: 'Beautiful design and very calming service.', rating: 5, date: '2026-02-14' },
+      { id: 'r2', user: 'Marcus', comment: 'Fantastic breakfast and sunset views.', rating: 4.7, date: '2026-01-22' },
+    ],
+  },
+  {
+    id: 'nordic-loft',
+    name: 'Nordic Loft Hotel',
+    location: 'Reykjavik, Iceland',
+    city: 'Reykjavik',
+    rating: 4.6,
+    reviewsCount: 201,
+    pricePerNight: 244,
+    description: 'A design-led urban stay with geothermal spa access and work-friendly lounges.',
+    longDescription:
+      'Nordic Loft Hotel offers clean Scandinavian interiors, a rooftop sauna, and seamless city access for modern travelers.',
+    amenities: ['Spa', 'WiFi', 'Breakfast', 'Workspace', 'Parking'],
+    images: [
+      'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1522798514-97ceb8c4f1c8?auto=format&fit=crop&w=1200&q=80',
+    ],
+    featured: true,
+    stars: 4,
+    roomTypes: [
+      {
+        id: 'studio',
+        name: 'Signature Studio',
+        description: 'Minimal room with an ergonomic workspace and skyline view.',
+        beds: '1 Queen Bed',
+        capacity: 2,
+        price: 244,
+      },
+    ],
+    reviews: [
+      { id: 'r3', user: 'Sofia', comment: 'Smart, stylish, and wonderfully quiet.', rating: 4.8, date: '2026-03-05' },
+    ],
+  },
+  {
+    id: 'citrine-haven',
+    name: 'Citrine Haven Resort',
+    location: 'Bali, Indonesia',
+    city: 'Bali',
+    rating: 4.9,
+    reviewsCount: 498,
+    pricePerNight: 325,
+    description: 'Lush villas, private pools, and curated wellness rituals in the jungle canopy.',
+    longDescription:
+      'Citrine Haven is designed for restorative escapes, with all-day dining, yoga decks, and immersive nature-led experiences.',
+    amenities: ['Pool', 'Spa', 'WiFi', 'Breakfast', 'Gym'],
+    images: [
+      'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+    ],
+    featured: true,
+    stars: 5,
+    roomTypes: [
+      {
+        id: 'garden-villa',
+        name: 'Garden Villa',
+        description: 'Private courtyard villa with plunge pool.',
+        beds: '1 King Bed',
+        capacity: 2,
+        price: 325,
+      },
+      {
+        id: 'wellness-suite',
+        name: 'Wellness Suite',
+        description: 'Larger suite with outdoor tub and yoga terrace.',
+        beds: '1 King Bed',
+        capacity: 2,
+        price: 410,
+      },
+    ],
+    reviews: [
+      { id: 'r4', user: 'Dev', comment: 'Every detail felt intentional and luxurious.', rating: 5, date: '2026-02-18' },
+    ],
+  },
+  {
+    id: 'copper-square',
+    name: 'Copper Square Suites',
+    location: 'New York, USA',
+    city: 'New York',
+    rating: 4.5,
+    reviewsCount: 158,
+    pricePerNight: 279,
+    description: 'Polished downtown suites close to culture, business, and late-night dining.',
+    longDescription:
+      'Copper Square Suites combines spacious rooms, concierge-led city itineraries, and a polished residential feel.',
+    amenities: ['WiFi', 'Breakfast', 'Gym', 'Workspace', 'Parking'],
+    images: [
+      'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80',
+    ],
+    stars: 4,
+    roomTypes: [
+      {
+        id: 'city-room',
+        name: 'City Room',
+        description: 'Smart room with skyline-facing windows.',
+        beds: '1 Queen Bed',
+        capacity: 2,
+        price: 279,
+      },
+    ],
+    reviews: [
+      { id: 'r5', user: 'Elena', comment: 'Ideal location and smooth check-in.', rating: 4.5, date: '2026-01-09' },
+    ],
+  },
+];
+
+export const sampleBookings = [
+  {
+    id: 'bk-001',
+    hotelId: 'azure-bay',
+    hotelName: 'Azure Bay Retreat',
+    roomTypeId: 'deluxe-suite',
+    checkIn: '2026-04-22',
+    checkOut: '2026-04-25',
+    guests: 2,
+    fullName: 'Amit Shah',
+    email: 'amit@example.com',
+    phone: '+91-9999999999',
+    total: 567,
+    status: 'Confirmed',
+  },
+];
