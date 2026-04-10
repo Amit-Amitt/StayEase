@@ -1,7 +1,7 @@
 import { MoonStar, SunMedium } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 
 export const Navbar = () => {

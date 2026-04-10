@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { Seo } from '@/components/Seo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useUserBookings } from '@/hooks/useHotels';
 import { useBookingStore } from '@/store/useBookingStore';
 import { formatCurrency } from '@/utils/currency';

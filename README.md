@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏨 StayEase — Hotel Booking Platform
 
 StayEase is a full-stack hotel booking web application built using the MERN stack. It allows users to browse hotels, book rooms, and manage reservations, while admins can manage listings and bookings.
@@ -97,10 +98,20 @@ npm run dev
 ---
 
 ### 3️⃣ Setup Frontend
+=======
+# StayEase
+
+StayEase is a full-stack hotel booking app with a Vite/React client and an Express/MongoDB API.
+
+## Local development
+
+Client:
+>>>>>>> 83fd36d (fix 404)
 
 ```bash
 cd client
 npm install
+<<<<<<< HEAD
 ```
 
 Create `.env` file inside `client/`:
@@ -201,3 +212,61 @@ This project is licensed under the MIT License.
 ---
 
 ⭐ If you like this project, give it a star!
+=======
+npm run dev
+```
+
+Server:
+
+```bash
+cd server
+npm install
+npm run dev
+```
+
+Use these environment variables while developing:
+
+- `client/.env`: `VITE_API_URL=http://localhost:5002/api`
+- `server/.env`: `PORT`, `MONGO_URI`, `JWT_SECRET`, `ALLOWED_ORIGINS`, `NODE_ENV`
+
+## Deployment
+
+### Option 1: Single deployment for API + frontend
+
+Build the client, then run the server:
+
+```bash
+cd client
+npm install
+npm run build
+
+cd ../server
+npm install
+npm start
+```
+
+Recommended production env:
+
+- Server:
+  - `NODE_ENV=production`
+  - `PORT=<platform port>`
+  - `MONGO_URI=<your mongo connection string>`
+  - `JWT_SECRET=<strong secret>`
+  - `ALLOWED_ORIGINS=https://your-frontend-domain.com`
+- Client:
+  - Leave `VITE_API_URL` unset to use same-origin `/api`, or set `VITE_API_URL=/api`
+
+### Option 2: Separate frontend and backend deployments
+
+- Deploy `server/` as the API service
+- Deploy `client/` as the frontend service
+- Set `client` env `VITE_API_URL=https://your-api-domain.com/api`
+- Set `server` env `ALLOWED_ORIGINS=https://your-frontend-domain.com`
+
+## Production checks
+
+- `GET /api/health` returns server health info for uptime checks
+- Unknown API routes return JSON 404 responses
+- The server validates required env vars on startup
+- CORS is controlled by `ALLOWED_ORIGINS`
+>>>>>>> 83fd36d (fix 404)

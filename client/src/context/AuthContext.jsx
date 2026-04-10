@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { AuthContext } from '@/context/auth-context';
 
 const AUTH_STORAGE_KEY = 'stayease-auth-user';
-
-const AuthContext = createContext(undefined);
 
 const readStoredUser = () => {
   if (typeof window === 'undefined') {
@@ -65,14 +64,4 @@ export const AuthProvider = ({ children }) => {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-
-  return context;
 };

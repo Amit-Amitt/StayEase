@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUserProfile, updateUserProfile, toggleSaveHotel } from '@/api/userApi';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 export const useUserProfile = () => {
   const { user } = useAuth();

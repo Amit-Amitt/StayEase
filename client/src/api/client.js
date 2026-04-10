@@ -1,7 +1,23 @@
 import axios from 'axios';
 
+const FALLBACK_API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5002/api';
+
+const normalizeApiBaseUrl = (value) => {
+  if (!value) {
+    return FALLBACK_API_URL;
+  }
+
+  const trimmedValue = value.trim().replace(/\/+$/, '');
+
+  if (trimmedValue.endsWith('/api')) {
+    return trimmedValue;
+  }
+
+  return `${trimmedValue}/api`;
+};
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5002/api',
+  baseURL: normalizeApiBaseUrl(import.meta.env.VITE_API_URL),
   timeout: 10000,
 });
 

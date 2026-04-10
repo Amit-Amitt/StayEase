@@ -1,17 +1,32 @@
 const express = require('express');
+const fs = require('node:fs');
 const path = require('node:path');
 const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./config/db');
-
-// Connect to db
-connectDB();
+const { parseAllowedOrigins, validateEnv } = require('./config/env');
 
 const app = express();
+const allowedOrigins = parseAllowedOrigins(process.env.ALLOWED_ORIGINS);
+const isProduction = process.env.NODE_ENV === 'production';
+const distPath = path.join(__dirname, '../client/dist');
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.set('trust proxy', 1);
+app.use(
+    cors({
+        origin(origin, callback) {
+            if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(new Error('CORS origin not allowed'));
+        },
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
+app.use(express.json({ limit: '1mb' }));
 
 // Set up routes (will be imported later)
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -23,29 +38,60 @@ app.get('/api', (req, res) => {
     res.json({ message: 'Welcome to StayEase API' });
 });
 
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        environment: process.env.NODE_ENV || 'development',
+        uptime: Math.round(process.uptime()),
+        timestamp: new Date().toISOString(),
+    });
+});
+
 // Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-    const distPath = path.join(__dirname, '../client/dist');
+if (isProduction && fs.existsSync(distPath)) {
     app.use(express.static(distPath));
 
-    app.get(/^(?!\/api).*/, (req, res) => {
-        // Skip API routes
-        if (req.path.startsWith('/api')) return next();
+    app.get(/^\/(?!api).*/, (req, res) => {
         res.sendFile(path.join(distPath, 'index.html'));
     });
 }
 
+app.use('/api', (req, res) => {
+    res.status(404).json({
+        message: `API route not found: ${req.method} ${req.originalUrl}`,
+    });
+});
+
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+});
+
 // Basic error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({
-        message: 'Something went wrong on the server',
+
+    if (err.message === 'CORS origin not allowed') {
+        return res.status(403).json({ message: err.message });
+    }
+
+    return res.status(500).json({
+        message: err.message || 'Something went wrong on the server',
         error: process.env.NODE_ENV === 'production' ? {} : err.message
     });
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+const startServer = async () => {
+    validateEnv();
+    await connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+};
+
+startServer().catch((error) => {
+    console.error(`Failed to start server: ${error.message}`);
+    process.exit(1);
 });

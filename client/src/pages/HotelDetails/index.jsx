@@ -14,7 +14,7 @@ import { HotelAmenities } from '@/hotel/components/HotelAmenities';
 import { HotelGallery } from '@/hotel/components/HotelGallery';
 import { useBookingStore } from '@/store/useBookingStore';
 import { useSearchStore } from '@/store/useSearchStore';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useUserProfile, useToggleSaveHotel } from '@/hooks/useUser';
 
 const toIsoDate = (value) => (value ? value.toISOString().split('T')[0] : null);

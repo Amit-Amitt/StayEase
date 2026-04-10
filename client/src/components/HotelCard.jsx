@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { RatingStars } from '@/components/RatingStars';
 import { PriceTag } from '@/components/PriceTag';
 import { useUserProfile, useToggleSaveHotel } from '@/hooks/useUser';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 export const HotelCard = ({ hotel }) => {
   const { user } = useAuth();

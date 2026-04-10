@@ -4,7 +4,7 @@ import { Seo } from '@/components/Seo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { apiClient } from '@/api/client';
 
 export default function LoginPage() {
@@ -70,8 +70,10 @@ export default function LoginPage() {
       });
 
     } catch (error) {
-       setErrors({ form: error.message });
-       return;
+      setErrors({
+        form: error.response?.data?.message || error.message || 'Unable to sign you in right now.',
+      });
+      return;
     }
 
     const redirectTo = location.state?.from?.pathname || '/';

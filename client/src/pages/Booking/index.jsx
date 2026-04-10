@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { BookingSummary } from '@/components/BookingSummary';
 import { Seo } from '@/components/Seo';
 import { Card } from '@/components/ui/Card';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useBookingStore } from '@/store/useBookingStore';
 import { useCreateBooking } from '@/hooks/useHotels';
 
