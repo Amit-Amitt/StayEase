@@ -16,24 +16,24 @@ app.set('trust proxy', 1);
 app.use(
     cors({
         origin(origin, callback) {
-            // Allow requests with no origin (like mobile apps, curl, or same-origin)
-            if (!origin) return callback(null, true);
+            // Allow if origin is missing (local, mobile apps) or if not in production
+            if (!origin || !isProduction) return callback(null, true);
 
-            // In development, allow all origins
-            if (!isProduction) return callback(null, true);
-
-            // In production, check against allowedOrigins
-            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+            // Allow if whitelisted, if whitelist is empty (permissive), or if wildcard is used
+            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
                 return callback(null, true);
             }
 
-            return callback(new Error('CORS origin not allowed'));
+            // Disallow the origin gracefully (no headers sent), avoiding crashing the preflight
+            return callback(null, false);
         },
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
         credentials: true,
+        optionsSuccessStatus: 200, // Fixes issues with legacy browsers/clients handling 204 No Content
     })
 );
+
 app.use(express.json({ limit: '1mb' }));
 
 // Set up routes (will be imported later)
