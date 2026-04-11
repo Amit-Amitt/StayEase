@@ -76,15 +76,25 @@ app.use((req, res) => {
 
 // Basic error handling middleware
 app.use((err, req, res, next) => {
+    // Log the error for internal debugging
+    console.error(`[Server Error] ${new Date().toISOString()}:`);
     console.error(err.stack);
 
+    // Handle specific CORS errors
     if (err.message === 'CORS origin not allowed') {
-        return res.status(403).json({ message: err.message });
+        return res.status(403).json({ 
+            success: false,
+            message: 'Access denied: CORS origin not allowed.',
+            error: isProduction ? null : err.message
+        });
     }
 
-    return res.status(500).json({
+    // Default error response
+    const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+    return res.status(statusCode).json({
+        success: false,
         message: err.message || 'Something went wrong on the server',
-        error: process.env.NODE_ENV === 'production' ? {} : err.message
+        error: isProduction ? null : err.stack
     });
 });
 
