@@ -59,3 +59,16 @@ apiClient.interceptors.response.use(
   }
 );
 
+// Function to check if the API is reachable (for diagnostics)
+export const checkConnectivity = async () => {
+  try {
+    const { data } = await apiClient.get('health');
+    console.log('[API Connectivity] Connected to:', data.environment || 'unknown');
+    return true;
+  } catch (error) {
+    console.warn('[API Connectivity] Backend is currently unreachable:', error.message);
+    return false;
+  }
+};
+
+

@@ -16,11 +16,16 @@ app.set('trust proxy', 1);
 app.use(
     cors({
         origin(origin, callback) {
-            // Allow if origin is missing (local, mobile apps) or if not in production
-            if (!origin || !isProduction) return callback(null, true);
+            // Always allow requests with no origin (e.g. mobile apps, local testing)
+            if (!origin) return callback(null, true);
 
-            // Allow if whitelisted, if whitelist is empty (permissive), or if wildcard is used
-            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+            // Allow all origins in development
+            if (!isProduction) return callback(null, true);
+
+            // In production, allow if whitelisted, is a localhost origin, or if whitelist is empty
+            const isLocalhost = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+            
+            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes('*') || isLocalhost) {
                 return callback(null, true);
             }
 
