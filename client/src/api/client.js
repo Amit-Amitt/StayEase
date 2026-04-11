@@ -3,17 +3,8 @@ import axios from 'axios';
 const FALLBACK_API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5002/api';
 
 const normalizeApiBaseUrl = (value) => {
-  if (!value) {
-    return FALLBACK_API_URL;
-  }
-
-  const trimmedValue = value.trim().replace(/\/+$/, '');
-
-  if (trimmedValue.endsWith('/api')) {
-    return trimmedValue;
-  }
-
-  return `${trimmedValue}/api`;
+  const base = value?.trim().replace(/\/+$/, '') || FALLBACK_API_URL.replace(/\/+$/, '');
+  return base.endsWith('/api') ? `${base}/` : `${base}/api/`;
 };
 
 export const apiClient = axios.create({

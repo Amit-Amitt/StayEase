@@ -55,7 +55,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await apiClient.post('/auth/login', {
+      const response = await apiClient.post('auth/login', {
         email: formData.email.trim(),
         password: formData.password
       });

@@ -59,7 +59,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await apiClient.post('/auth/register', {
+      const response = await apiClient.post('auth/register', {
         name: formData.name.trim(),
         email: formData.email.trim(),
         password: formData.password

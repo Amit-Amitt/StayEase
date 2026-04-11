@@ -16,14 +16,22 @@ app.set('trust proxy', 1);
 app.use(
     cors({
         origin(origin, callback) {
-            if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+            // Allow requests with no origin (like mobile apps, curl, or same-origin)
+            if (!origin) return callback(null, true);
+
+            // In development, allow all origins
+            if (!isProduction) return callback(null, true);
+
+            // In production, check against allowedOrigins
+            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
 
             return callback(new Error('CORS origin not allowed'));
         },
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+        credentials: true,
     })
 );
 app.use(express.json({ limit: '1mb' }));

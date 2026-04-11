@@ -1,17 +1,17 @@
 import { apiClient } from '@/api/client';
 
 export const getHotels = async () => {
-  const { data } = await apiClient.get('/hotels');
+  const { data } = await apiClient.get('hotels');
   return data;
 };
 
 export const getFeaturedHotels = async () => {
-  const { data } = await apiClient.get('/hotels', { params: { featured: 'true' } });
+  const { data } = await apiClient.get('hotels', { params: { featured: 'true' } });
   return data;
 };
 
 export const getHotelDetails = async (hotelId) => {
-  const { data } = await apiClient.get(`/hotels/${hotelId}`);
+  const { data } = await apiClient.get(`hotels/${hotelId}`);
   return data;
 };
 
@@ -31,7 +31,7 @@ export const searchHotels = async (params, filters) => {
     queryParams.amenities = filters.amenities.join(',');
   }
 
-  const { data } = await apiClient.get('/hotels/search', { params: queryParams });
+  const { data } = await apiClient.get('hotels/search', { params: queryParams });
 
   // Fallback frontend sorting
   let result = [...data];
@@ -55,28 +55,28 @@ export const createBooking = async (payload) => {
     // hotelId, roomTypeId, checkIn, checkOut, guests, fullName, email, phone
   };
 
-  const { data } = await apiClient.post('/bookings', requestBody);
+  const { data } = await apiClient.post('bookings', requestBody);
   return data;
 };
 
 export const getUserBookings = async () => {
-  const { data } = await apiClient.get('/bookings/user');
+  const { data } = await apiClient.get('bookings/user');
   return data;
 };
 
 // Admin Operations
 export const createHotel = async (payload) => {
-  const { data } = await apiClient.post('/hotels', payload);
+  const { data } = await apiClient.post('hotels', payload);
   return data;
 };
 
 export const updateHotel = async ({ id, ...payload }) => {
-  const { data } = await apiClient.put(`/hotels/${id}`, payload);
+  const { data } = await apiClient.put(`hotels/${id}`, payload);
   return data;
 };
 
 export const deleteHotel = async (id) => {
-  const { data } = await apiClient.delete(`/hotels/${id}`);
+  const { data } = await apiClient.delete(`hotels/${id}`);
   return data;
 };
 
