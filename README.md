@@ -81,14 +81,6 @@ cd server
 npm install
 ```
 
-Create `.env` file inside `server/`:
-
-```
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-```
-
 Run backend:
 
 ```bash
@@ -112,12 +104,6 @@ Client:
 cd client
 npm install
 <<<<<<< HEAD
-```
-
-Create `.env` file inside `client/`:
-
-```
-VITE_API_URL=http://localhost:5000
 ```
 
 Run frontend:
@@ -144,9 +130,6 @@ npm run dev
 * Output Directory: `dist`
 * Add environment variable:
 
-```
-VITE_API_URL=https://your-backend.onrender.com
-```
 
 ---
 
@@ -166,19 +149,10 @@ PORT=
 VITE_API_URL=
 ```
 
----
-
-## ⚠️ Common Issues
-
-* CORS error → fix backend CORS config
-* MongoDB connection error → whitelist IP in Atlas
-* API not working → check environment variables
-
----
 
 ## 📸 Screenshots
 
-(Add your project screenshots here)
+<img src="screenshot.png" alt="screenshot-hero-section" width="200px">
 
 ---
 
