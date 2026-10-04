@@ -19,6 +19,8 @@ const reviewSchema = new mongoose.Schema({
 
 const hotelSchema = new mongoose.Schema({
     id: { type: String, unique: true }, // The string ID from frontend e.g., 'azure-bay'
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    staffIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     name: String,
     location: String,
     city: String,

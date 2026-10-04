@@ -1,12 +1,13 @@
 const Booking = require('../models/Booking');
 const Hotel = require('../models/Hotel');
+const { canManageHotel } = require('../middleware/authMiddleware');
 
 // @desc    Create new booking
 // @route   POST /api/bookings
 // @access  Public (or Private depending on frontend)
 const createBooking = async (req, res) => {
     try {
-        const { hotelId, roomTypeId, checkIn, checkOut, guests, fullName, email, phone, status } = req.body;
+        const { hotelId, roomTypeId, checkIn, checkOut, guests, fullName, email, phone } = req.body;
 
         const hotel = await Hotel.findOne({ $or: [{ id: hotelId }, { _id: hotelId.match(/^[0-9a-fA-F]{24}$/) ? hotelId : null }] });
         if (!hotel) {
@@ -40,7 +41,7 @@ const createBooking = async (req, res) => {
             email,
             phone,
             total,
-            status: status || 'Confirmed'
+            status: 'Confirmed'
         });
 
         const createdBooking = await booking.save();
@@ -65,7 +66,43 @@ const getUserBookings = async (req, res) => {
     }
 };
 
+const getHotelBookings = async (req, res) => {
+    const hotelId = req.params.hotelId;
+    const hotel = await Hotel.findOne({
+        $or: [
+            { id: hotelId },
+            { _id: /^[0-9a-fA-F]{24}$/.test(hotelId) ? hotelId : null }
+        ]
+    });
+    if (!hotel) return res.status(404).json({ message: 'Hotel not found' });
+    if (!canManageHotel(req.user, hotel)) {
+        return res.status(403).json({ message: 'You do not manage this hotel' });
+    }
+    const ids = [hotel.id, String(hotel._id)].filter(Boolean);
+    const bookings = await Booking.find({ hotelId: { $in: ids } }).sort({ createdAt: -1 });
+    return res.json(bookings);
+};
+
+const updateBookingStatus = async (req, res) => {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+    const hotel = await Hotel.findOne({
+        $or: [
+            { id: booking.hotelId },
+            { _id: /^[0-9a-fA-F]{24}$/.test(booking.hotelId) ? booking.hotelId : null }
+        ]
+    });
+    if (!canManageHotel(req.user, hotel)) {
+        return res.status(403).json({ message: 'You do not manage this hotel' });
+    }
+    booking.status = req.body.status;
+    await booking.save();
+    return res.json(booking);
+};
+
 module.exports = {
     createBooking,
-    getUserBookings
+    getUserBookings,
+    getHotelBookings,
+    updateBookingStatus
 };

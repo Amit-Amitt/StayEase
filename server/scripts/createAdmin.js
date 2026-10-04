@@ -9,7 +9,14 @@ const setupAdmin = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('MongoDB Connected');
 
-    const adminExists = await User.findOne({ email: 'admin@stayease.com' });
+    const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+    const password = process.env.ADMIN_PASSWORD;
+    const name = process.env.ADMIN_NAME || 'StayEase Admin';
+    if (!email || !password || password.length < 12) {
+      throw new Error('Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 12 characters');
+    }
+
+    const adminExists = await User.findOne({ email });
 
     if (adminExists) {
       console.log('Admin user already exists!');
@@ -17,13 +24,14 @@ const setupAdmin = async () => {
     }
 
     const adminUser = await User.create({
-      name: 'Admin User',
-      email: 'admin@stayease.com',
-      password: 'adminpassword123',
-      role: 'admin'
+      name,
+      email,
+      password,
+      role: 'ADMIN',
+      emailVerified: true
     });
 
-    console.log(`Admin User Created!\nEmail: ${adminUser.email}\nPassword: adminpassword123`);
+    console.log(`Admin user created: ${adminUser.email}`);
     process.exit();
   } catch (error) {
     console.error('Error creating admin:', error);
