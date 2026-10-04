@@ -1,19 +1,17 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/Button';
 import { BookingSummary } from '@/components/BookingSummary';
 import { Seo } from '@/components/Seo';
 import { Card } from '@/components/ui/Card';
 import { useAuth } from '@/context/useAuth';
 import { useBookingStore } from '@/store/useBookingStore';
-import { useCreateBooking } from '@/hooks/useHotels';
+import { PaymentMethods } from '@/booking/components/PaymentMethods';
 
 export default function BookingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hotelId = '' } = useParams();
-  const { draft, addBooking, resetDraft } = useBookingStore();
-  const { mutate: createBooking, isPending } = useCreateBooking();
+  const { draft, resetDraft } = useBookingStore();
   const hotel = draft.hotel;
   
   const room = hotel 
@@ -47,33 +45,6 @@ export default function BookingPage() {
     navigate('/');
   };
 
-  const handleConfirm = () => {
-    createBooking(
-      {
-        hotelId: hotel.id || hotel._id,
-        roomTypeId: room.id,
-        checkIn: draft.search.checkIn ?? '',
-        checkOut: draft.search.checkOut ?? '',
-        guests: draft.search.guests,
-        fullName: user.name || 'Guest User',
-        email: user.email,
-        phone: 'Not Provided',
-        specialRequests: '',
-      },
-      {
-        onSuccess: (data) => {
-          addBooking(data);
-          resetDraft();
-          toast.success('Booking confirmed');
-          navigate('/profile');
-        },
-        onError: (error) => {
-          toast.error(error.response?.data?.message || 'Failed to complete booking');
-        },
-      }
-    );
-  };
-
   return (
     <>
       <Seo title="Review Booking | StayEase" description="Review details and confirm your stay." />
@@ -90,14 +61,22 @@ export default function BookingPage() {
             </div>
           </div>
           
-          <div className="mt-8 flex gap-4">
-            <Button type="button" variant="secondary" className="flex-1" onClick={handleCancel} disabled={isPending}>
+          <div className="mt-8">
+            <Button type="button" variant="secondary" className="w-full" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="button" className="flex-1" onClick={handleConfirm} disabled={isPending}>
-              {isPending ? 'Processing...' : 'Confirm'}
-            </Button>
           </div>
+          <PaymentMethods payload={{
+            hotelId: hotel.id || hotel._id,
+            roomTypeId: room.id,
+            checkIn: draft.search.checkIn ?? '',
+            checkOut: draft.search.checkOut ?? '',
+            guests: draft.search.guests,
+            fullName: user.name || 'Guest User',
+            email: user.email,
+            phone: 'Not Provided',
+            specialRequests: '',
+          }} />
         </Card>
 
         <BookingSummary

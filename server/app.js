@@ -22,7 +22,14 @@ app.use(cors({
     credentials: true,
     optionsSuccessStatus: 200
 }));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({
+    limit: '1mb',
+    verify(req, res, buffer) {
+        if (req.originalUrl.split('?')[0] === '/api/bookings/razorpay/webhook') {
+            req.rawBody = Buffer.from(buffer);
+        }
+    }
+}));
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));

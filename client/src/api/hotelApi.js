@@ -48,14 +48,17 @@ export const searchHotels = async (params, filters) => {
 };
 
 export const createBooking = async (payload) => {
-  // Ensure payload sends the proper fields backend expects
-  const requestBody = {
-    ...payload,
-    // Add missing mockData details if needed, but backend takes:
-    // hotelId, roomTypeId, checkIn, checkOut, guests, fullName, email, phone
-  };
+  const { data } = await apiClient.post('bookings', payload);
+  return data;
+};
 
-  const { data } = await apiClient.post('bookings', requestBody);
+export const verifyBookingPayment = async (payload) => {
+  const { data } = await apiClient.post('bookings/verify-payment', payload);
+  return data;
+};
+
+export const capturePaypalBooking = async (payload) => {
+  const { data } = await apiClient.post('bookings/paypal/capture', payload);
   return data;
 };
 
@@ -79,4 +82,3 @@ export const deleteHotel = async (id) => {
   const { data } = await apiClient.delete(`hotels/${id}`);
   return data;
 };
-
