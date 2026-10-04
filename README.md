@@ -5,10 +5,7 @@ StayEase is a full-stack hotel booking web application built using the MERN stac
 
 ---
 
-## 🚀 Live Demo
-
-* 🌐 Frontend: https://stay-ease-six-xi.vercel.app/
-* 🔗 Backend API: https://stayease-pswe.onrender.com
+* 🌐 Live Link: https://stay-ease-six-xi.vercel.app/
 
 ---
 
