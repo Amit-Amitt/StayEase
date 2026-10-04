@@ -7,59 +7,7 @@ StayEase is a full-stack hotel booking web application built using the MERN stac
 
 ## 🚀 Live Demo
 
-* 🌐 Frontend: https://stay-ease-six-xi.vercel.app/
-* 🔗 Backend API: https://stayease-pswe.onrender.com
-
----
-
-## 🧰 Tech Stack
-
-### Frontend
-
-* React (Vite)
-* Tailwind CSS
-* Axios
-* React Router
-
-### Backend
-
-* Node.js
-* Express.js
-* MongoDB (Mongoose)
-* JWT Authentication
-
-### Deployment
-
-* Frontend: Vercel
-* Backend: Render
-* Database: MongoDB Atlas
-
----
-
-## ✨ Features
-
-### 👤 User Features
-
-* User registration & login
-* Browse hotels & rooms
-* Book rooms
-* View bookings
-
-### 🛠️ Admin Features
-
-* Add / Edit / Delete hotels
-* Manage bookings
-* Dashboard overview
-
----
-
-## 📁 Project Structure
-
-```
-StayEase/
-├── client/     # React frontend
-├── server/     # Express backend
-```
+* 🌐 Live Link: https://stay-ease-six-xi.vercel.app/
 
 ---
 
@@ -68,7 +16,7 @@ StayEase/
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/your-username/StayEase.git
+git clone https://github.com/amit-amitt/StayEase.git
 cd StayEase
 ```
 
