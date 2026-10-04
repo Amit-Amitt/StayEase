@@ -21,8 +21,9 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
     }
 
     let active = true;
+    const container = containerRef.current;
     const renderButton = () => {
-      if (!active || !containerRef.current || !window.google?.accounts?.id) return;
+      if (!active || !container || !window.google?.accounts?.id) return;
       setLoadError('');
       window.google.accounts.id.initialize({
         client_id: clientId,
@@ -31,14 +32,14 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
           else onErrorRef.current?.('Google did not return a sign-in credential. Try again.');
         },
       });
-      containerRef.current.replaceChildren();
-      window.google.accounts.id.renderButton(containerRef.current, {
+      container.replaceChildren();
+      window.google.accounts.id.renderButton(container, {
         type: 'standard',
         theme: 'outline',
         size: 'large',
         text,
         shape: 'rectangular',
-        width: Math.min(containerRef.current.clientWidth || 400, 400),
+        width: Math.min(container.clientWidth || 400, 400),
         logo_alignment: 'left',
       });
     };
@@ -69,7 +70,7 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
       const currentScript = document.getElementById(GOOGLE_SCRIPT_ID);
       currentScript?.removeEventListener('load', renderButton);
       currentScript?.removeEventListener('error', handleScriptError);
-      if (containerRef.current) containerRef.current.replaceChildren();
+      container?.replaceChildren();
     };
   }, [clientId, text]);
 
