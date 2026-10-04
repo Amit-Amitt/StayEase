@@ -3,12 +3,20 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Seo } from '@/components/Seo';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/context/useAuth';
 import { apiClient } from '@/api/client';
+import { z } from 'zod';
+import { Loader } from '@/components/ui/Loader';
+
+const loginSchema = z.object({
+  email: z.string().trim().email(),
+  password: z.string().min(1).max(128).refine((value) => new TextEncoder().encode(value).length <= 72, 'Password must not exceed 72 UTF-8 bytes.'),
+});
 
 export default function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, isReady, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -16,6 +24,8 @@ export default function LoginPage() {
     password: '',
   });
   const [errors, setErrors] = useState({});
+
+  if (!isReady) return <Loader />;
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -39,35 +49,20 @@ export default function LoginPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const nextErrors = {};
-
-    if (!formData.email.trim()) {
-      nextErrors.email = 'Email is required.';
-    }
-
-    if (!formData.password.trim()) {
-      nextErrors.password = 'Password is required.';
-    }
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
+    const parsed = loginSchema.safeParse(formData);
+    if (!parsed.success) {
+      setErrors(Object.fromEntries(parsed.error.issues.map((issue) => [issue.path[0], issue.message])));
       return;
     }
 
     try {
       const response = await apiClient.post('auth/login', {
-        email: formData.email.trim(),
-        password: formData.password
+        email: parsed.data.email,
+        password: parsed.data.password
       });
       
       const data = response.data;
-
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token
-      });
+      login({ ...data.user, token: data.token });
 
     } catch (error) {
       setErrors({
@@ -78,6 +73,18 @@ export default function LoginPage() {
 
     const redirectTo = location.state?.from?.pathname || '/';
     navigate(redirectTo, { replace: true });
+  };
+
+  const handleGoogleSignIn = async (credential) => {
+    setErrors({});
+    try {
+      const { data } = await apiClient.post('auth/google', { credential });
+      login({ ...data.user, token: data.token });
+      const redirectTo = location.state?.from?.pathname || '/';
+      navigate(redirectTo, { replace: true });
+    } catch (error) {
+      setErrors({ form: error.response?.data?.message || error.message || 'Unable to sign you in with Google right now.' });
+    }
   };
 
   return (
@@ -93,7 +100,11 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="mt-8">
+            <GoogleSignInButton onCredential={handleGoogleSignIn} onError={(message) => setErrors({ form: message })} text="signin_with" />
+          </div>
+
+          <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium">
                 Email
@@ -117,6 +128,7 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="current-password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
@@ -124,7 +136,12 @@ export default function LoginPage() {
               {errors.password ? <p className="mt-2 text-sm text-rose-500">{errors.password}</p> : null}
             </div>
 
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-sm font-semibold text-primary">Forgot password?</Link>
+            </div>
+
             {errors.form ? <p className="text-sm text-rose-500">{errors.form}</p> : null}
+            <Link to="/verify-email" state={{ email: formData.email }} className="block text-sm font-semibold text-primary">Need a verification link?</Link>
 
             <Button type="submit" className="h-12 w-full justify-center">
               Login

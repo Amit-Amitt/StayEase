@@ -19,7 +19,7 @@ export const useUpdateProfile = () => {
     mutationFn: updateUserProfile,
     onSuccess: (data) => {
       queryClient.setQueryData(['userProfile'], data);
-      login({ email: data.email, name: data.name, role: data.role });
+      login({ email: data.email, name: data.name, role: data.role, emailVerified: data.emailVerified });
     },
   });
 };

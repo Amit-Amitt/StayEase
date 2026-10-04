@@ -11,7 +11,7 @@ export const Navbar = () => {
   const navLinks = [
     ['/', 'Home'],
     ['/search', 'Explore'],
-    ...(user?.role === 'admin' ? [['/admin', 'Admin Dashboard']] : []),
+    ...(user?.role?.toUpperCase() === 'ADMIN' ? [['/admin', 'Admin Dashboard']] : []),
   ];
 
   return (
@@ -43,7 +43,7 @@ export const Navbar = () => {
               >
                 Profile
               </Link>
-              <Button type="button" variant="secondary" className="px-4 py-2 sm:px-5 sm:py-3" onClick={logout}>
+              <Button type="button" variant="secondary" className="px-4 py-2 sm:px-5 sm:py-3" onClick={() => void logout()}>
                 Logout
               </Button>
             </>

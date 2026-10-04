@@ -3,72 +3,75 @@ import axios from 'axios';
 const FALLBACK_API_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5002/api';
 
 const normalizeApiBaseUrl = (value) => {
-  let base = value?.trim();
-  
-  // Use fallback if value is empty or missing
-  if (!base) {
-    base = FALLBACK_API_URL;
-  }
-  
-  // Remove trailing slashes
+  let base = value?.trim() || FALLBACK_API_URL;
   base = base.replace(/\/+$/, '');
-  
-  // Ensure it ends with /api/
   return base.endsWith('/api') ? `${base}/` : `${base}/api/`;
 };
 
-export const apiClient = axios.create({
-  baseURL: normalizeApiBaseUrl(import.meta.env.VITE_API_URL),
-  timeout: 10000,
-  withCredentials: true,
+const baseURL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
+export const apiClient = axios.create({ baseURL, timeout: 10000, withCredentials: true });
+
+let accessToken = null;
+let refreshPromise;
+export const setAccessToken = (token) => {
+  accessToken = token || null;
+};
+
+export const clearAccessToken = () => {
+  accessToken = null;
+};
+
+const clearSession = () => {
+  clearAccessToken();
+  localStorage.removeItem('stayease-auth-user');
+  window.dispatchEvent(new Event('stayease:unauthorized'));
+};
+
+apiClient.interceptors.request.use((config) => {
+  if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+  return config;
 });
 
-// Request interceptor: Add Auth token
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor: Handle global errors and token cleanup
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const originalRequest = error.config;
+  async (error) => {
+    const request = error.config;
+    const url = request?.url || '';
+    const isAuthEndpoint = url.startsWith('auth/');
 
-    // Handle 401 Unauthorized errors (session expired)
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      console.warn('Session expired or unauthorized. Clearing local storage...');
-      localStorage.removeItem('token');
-      localStorage.removeItem('stayease-auth-user');
-      
-      // We don't automatically redirect to avoid loops, 
-      // but the UI will react to the missing user state.
+    if (error.response?.status === 401 && request && !request._retry && !isAuthEndpoint) {
+      request._retry = true;
+      try {
+        refreshPromise ||= axios.post(`${baseURL}auth/refresh`, {}, {
+          withCredentials: true,
+          timeout: 10000,
+          headers: { 'Content-Type': 'application/json' }
+        }).then(({ data }) => {
+          setAccessToken(data.token);
+          localStorage.setItem('stayease-auth-user', JSON.stringify(data.user));
+          return data.token;
+        }).finally(() => {
+          refreshPromise = undefined;
+        });
+        const token = await refreshPromise;
+        request.headers.Authorization = `Bearer ${token}`;
+        return apiClient(request);
+      } catch {
+        clearSession();
+      }
     }
 
-    // Log the error details for easier debugging in the console
     const message = error.response?.data?.message || error.message || 'An unexpected API error occurred';
-    console.error(`[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}:`, message);
-
+    console.error(`[API Error] ${request?.method?.toUpperCase()} ${url}:`, message);
     return Promise.reject(error);
-  }
+  },
 );
 
-// Function to check if the API is reachable (for diagnostics)
 export const checkConnectivity = async () => {
   try {
-    const { data } = await apiClient.get('health');
-    console.log('[API Connectivity] Connected to:', data.environment || 'unknown');
+    await apiClient.get('health');
     return true;
-  } catch (error) {
-    console.warn('[API Connectivity] Backend is currently unreachable:', error.message);
+  } catch {
     return false;
   }
 };
-
-

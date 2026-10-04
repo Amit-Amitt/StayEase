@@ -17,6 +17,7 @@ import { HotelCard } from '@/components/HotelCard';
 export default function ProfilePage() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('trips');
+  const [verificationUrl, setVerificationUrl] = useState('');
 
   const { data: apiBookings, isLoading: loadingBookings } = useUserBookings();
   const { bookings: storeBookings } = useBookingStore();
@@ -40,7 +41,10 @@ export default function ProfilePage() {
 
   const onUpdateProfile = (val) => {
     updateProfile(val, {
-      onSuccess: () => toast.success("Profile updated seamlessly!"),
+      onSuccess: (data) => {
+        setVerificationUrl(data.verificationUrl || '');
+        toast.success(data.emailVerified === false ? 'Profile updated. Verify your new email to keep your account active.' : 'Profile updated.');
+      },
       onError: (err) => toast.error(err.response?.data?.message || "Failed to update profile")
     });
   };
@@ -161,6 +165,13 @@ export default function ProfilePage() {
           {activeTab === 'settings' && (
             <Card className="max-w-xl p-6">
               <h2 className="text-2xl font-bold">Account settings</h2>
+              {profile?.emailVerified === false ? (
+                <p className="mt-4 text-sm text-amber-700" role="status">
+                  Verify {profile.email} to finish changing your email.{' '}
+                  {verificationUrl ? <a href={verificationUrl} className="font-semibold underline">Verify email</a> : null}
+                  {' '}<Link to="/verify-email" state={{ email: profile.email }} className="font-semibold underline">Send another link</Link>
+                </p>
+              ) : null}
               <form onSubmit={form.handleSubmit(onUpdateProfile)} className="mt-6 space-y-5">
                  <div>
                    <label className="mb-2 block text-sm font-medium">Full Name</label>

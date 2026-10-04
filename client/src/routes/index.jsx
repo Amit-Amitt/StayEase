@@ -14,7 +14,11 @@ const LoginPage = lazy(() => import('@/pages/Login'));
 const RegisterPage = lazy(() => import('@/pages/Register'));
 const NotFoundPage = lazy(() => import('@/pages/NotFound'));
 const AdminDashboardPage = lazy(() => import('@/pages/AdminDashboard/index'));
+const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmail'));
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPassword'));
 import { AdminRoute } from '@/components/AdminRoute';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 const withSuspense = (element) => <Suspense fallback={<Loader />}>{element}</Suspense>;
 
@@ -30,11 +34,14 @@ export const router = createBrowserRouter([
       { index: true, element: withSuspense(<HomePage />) },
       { path: 'search', element: withSuspense(<SearchResultsPage />) },
       { path: 'hotel/:id', element: withSuspense(<HotelDetailsPage />) },
-      { path: 'booking/:hotelId', element: withSuspense(<BookingPage />) },
-      { path: 'checkout', element: withSuspense(<CheckoutPage />) },
-      { path: 'profile', element: withSuspense(<ProfilePage />) },
+      { path: 'booking/:hotelId', element: <ProtectedRoute>{withSuspense(<BookingPage />)}</ProtectedRoute> },
+      { path: 'checkout', element: <ProtectedRoute>{withSuspense(<CheckoutPage />)}</ProtectedRoute> },
+      { path: 'profile', element: <ProtectedRoute>{withSuspense(<ProfilePage />)}</ProtectedRoute> },
       { path: 'login', element: withSuspense(<LoginPage />) },
       { path: 'register', element: withSuspense(<RegisterPage />) },
+      { path: 'verify-email', element: withSuspense(<VerifyEmailPage />) },
+      { path: 'forgot-password', element: withSuspense(<ForgotPasswordPage />) },
+      { path: 'reset-password', element: withSuspense(<ResetPasswordPage />) },
       { path: 'admin', element: <AdminRoute>{withSuspense(<AdminDashboardPage />)}</AdminRoute> },
       { path: '*', element: withSuspense(<NotFoundPage />) },
     ],

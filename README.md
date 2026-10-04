@@ -5,8 +5,62 @@ StayEase is a full-stack hotel booking web application built using the MERN stac
 
 ---
 
-* 🌐 Live Link: https://stay-ease-six-xi.vercel.app/
- 
+## 🚀 Live Demo
+
+* 🌐 Frontend: https://stay-ease-six-xi.vercel.app/
+* 🔗 Backend API: https://stayease-pswe.onrender.com
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+
+* React (Vite)
+* Tailwind CSS
+* Axios
+* React Router
+
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB (Mongoose)
+* JWT Authentication
+
+### Deployment
+
+* Frontend: Vercel
+* Backend: Render
+* Database: MongoDB Atlas
+
+---
+
+## ✨ Features
+
+### 👤 User Features
+
+* User registration & login
+* Browse hotels & rooms
+* Book rooms
+* View bookings
+
+### 🛠️ Admin Features
+
+* Add / Edit / Delete hotels
+* Manage bookings
+* Dashboard overview
+
+---
+
+## 📁 Project Structure
+
+```
+StayEase/
+├── client/     # React frontend
+├── server/     # Express backend
+```
+
 ---
 
 ## ⚙️ Installation & Setup
@@ -25,168 +79,105 @@ cd StayEase
 ```bash
 cd server
 npm install
-```
-
-Run backend:
-
-```bash
 npm run dev
 ```
 
----
+For local email testing, SMTP is optional. Without SMTP, verification and reset links are printed by the API and included in development responses. To send email locally or in production, configure these values:
 
-### 3️⃣ Setup Frontend
-=======
-# StayEase
+```env
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-user
+SMTP_PASS=your-smtp-password
+SMTP_FROM=StayEase <no-reply@example.com>
+```
 
-StayEase is a full-stack hotel booking app with a Vite/React client and an Express/MongoDB API.
+Create `client/.env` and start the client:
 
-## Local development
-
-Client:
->>>>>>> 83fd36d (fix 404)
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+```
 
 ```bash
 cd client
 npm install
-<<<<<<< HEAD
+npm run dev
 ```
 
-Run frontend:
+Register with an email you can access, then open the verification link. In development without SMTP, the link is available in the API response and its console output.
+
+### Google sign-in setup
+
+Create an OAuth 2.0 Client ID for a Web application in Google Cloud Console. Add each deployed client host (and `http://localhost:5173` for local development) to its authorized JavaScript origins. Put that client ID in both `server/.env` as `GOOGLE_CLIENT_ID` and `client/.env` as `VITE_GOOGLE_CLIENT_ID`; the server checks the Google credential signature and audience before creating or signing in a StayEase user. No client secret or redirect URI is used by this Google Identity Services flow.
+
+## Admin setup
+
+Create the first admin from the server directory with a unique email and a strong password:
 
 ```bash
-npm run dev
+ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='use-a-long-unique-password' npm run create-admin
 ```
 
----
+Admins assign `HOTEL_OWNER`, `STAFF`, or `ADMIN` roles to other accounts through `PATCH /api/users/:id/role`. Public registration always creates a `USER` account. Existing lowercase `user` and `admin` role values are normalized to uppercase by the API.
 
-## 🌐 Deployment
+## Authentication API
 
-### Backend (Render)
+All request and response bodies use JSON. Authentication inputs are validated with Zod. Passwords require at least 8 characters and are limited to 72 UTF-8 bytes for bcrypt compatibility. Access JWTs expire after 15 minutes. Refresh tokens rotate on use, are stored hashed in MongoDB, and are set in an HTTP-only cookie scoped to `/api/auth`.
 
-* Set Root Directory: `server`
-* Build Command: `npm install`
-* Start Command: `node server.js`
-* Add environment variables
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/register` | Public | Create an unverified `USER` account. Body: `{ "name", "email", "password" }`. |
+| `POST` | `/api/auth/verify-email` | Public | Verify a link. Body: `{ "token" }`. |
+| `POST` | `/api/auth/resend-verification` | Public | Request another verification email. Body: `{ "email" }`. |
+| `POST` | `/api/auth/login` | Public | Sign in. Body: `{ "email", "password" }`. Returns `{ "token", "user" }` and sets the refresh cookie. |
+| `POST` | `/api/auth/google` | Public | Create an account or sign in with a verified Google ID token. Body: `{ "credential" }`. Returns `{ "token", "user" }` and sets the refresh cookie. |
+| `POST` | `/api/auth/refresh` | Refresh cookie | Rotate the refresh token and return a new access token. |
+| `POST` | `/api/auth/logout` | Refresh cookie | Revoke the current refresh token and clear the cookie. |
+| `POST` | `/api/auth/forgot-password` | Public | Request a reset email. Body: `{ "email" }`. The response is generic to avoid account discovery. |
+| `POST` | `/api/auth/reset-password` | Public | Set a new password. Body: `{ "token", "password" }`. This revokes all refresh sessions. |
 
-### Frontend (Vercel)
+Send the access token on protected API calls using `Authorization: Bearer <token>`. The browser client refreshes it when an API call returns 401.
 
-* Set Root Directory: `client`
-* Build Command: `npm run build`
-* Output Directory: `dist`
-* Add environment variable:
+## Roles and protected APIs
 
+| Role | Access |
+| --- | --- |
+| `USER` | Own profile, saved stays, bookings, and booking flows. |
+| `HOTEL_OWNER` | User access plus create and manage hotels they own; assign staff to owned hotels. |
+| `STAFF` | User access plus manage assigned hotel listings and view/update those hotels' bookings. |
+| `ADMIN` | User access, all hotel operations, booking management, and assigning roles. |
 
----
+The API checks ownership and staff assignments on every hotel write and booking-management request. Frontend `/profile`, `/booking/*`, and `/checkout` routes require a session; `/admin` requires `ADMIN`. Frontend checks are convenience controls and do not replace API authorization.
 
-## 🔐 Environment Variables
+| Method | Endpoint | Access |
+| --- | --- | --- |
+| `GET`, `PUT` | `/api/users/profile` | Any signed-in user |
+| `POST` | `/api/users/save-hotel/:id` | Any signed-in user |
+| `PATCH` | `/api/users/:id/role` | `ADMIN`; body: `{ "role": "USER\|HOTEL_OWNER\|STAFF\|ADMIN" }` |
+| `GET` | `/api/hotels`, `/api/hotels/:id` | Public |
+| `POST` | `/api/hotels` | `ADMIN`, `HOTEL_OWNER` |
+| `PUT`, `DELETE` | `/api/hotels/:id` | `ADMIN`, assigned `HOTEL_OWNER`, or assigned `STAFF` |
+| `PATCH` | `/api/hotels/:id/staff` | `ADMIN` or managing `HOTEL_OWNER`; body: `{ "userId", "action": "add\|remove" }` |
+| `POST` | `/api/bookings` | Any signed-in user |
+| `GET` | `/api/bookings/user` | Any signed-in user; returns only that user's bookings |
+| `GET` | `/api/bookings/hotel/:hotelId` | `ADMIN`, managing `HOTEL_OWNER`, or assigned `STAFF` |
+| `PATCH` | `/api/bookings/:id/status` | `ADMIN`, managing `HOTEL_OWNER`, or assigned `STAFF`; status is `Confirmed`, `Cancelled`, or `Completed` |
 
-### Backend (`server/.env`)
+## Production configuration
 
-```
-MONGO_URI=
-JWT_SECRET=
-PORT=
-```
+Set `NODE_ENV=production`, a random `JWT_SECRET` with at least 32 characters, `MONGO_URI`, `CLIENT_URL`, `ALLOWED_ORIGINS` with explicit comma-separated frontend origins, and the SMTP settings above. Production startup rejects missing email/origin configuration and wildcard origins. Deploy the client and API together by building `client` and serving its `dist` directory from the API, or deploy them separately and set `VITE_API_URL` to the API's `/api` URL.
 
-### Frontend (`client/.env`)
+To offer Google sign-in in production, set `GOOGLE_CLIENT_ID` on the API and the same value as `VITE_GOOGLE_CLIENT_ID` when building the client. Add every production client origin to the OAuth application's authorized JavaScript origins.
 
-```
-VITE_API_URL=
-```
+## Verification
 
-
-## 📸 Screenshots
-
-<img src="screenshot.png" alt="screenshot-hero-section" width="200px">
-
----
-
-## 📌 Future Improvements
-
-* Payment integration (Stripe/Razorpay)
-* Reviews & ratings system
-* Email notifications
-* Advanced search filters
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to fork this repo and submit a pull request.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 👨‍💻 Author
-
-**Amit**
-
-* GitHub: https://github.com/Amit-Amitt
-
----
-
-⭐ If you like this project, give it a star!
-=======
-npm run dev
-```
-
-Server:
+Run authentication and authorization integration tests with:
 
 ```bash
 cd server
-npm install
-npm run dev
+npm test
 ```
 
-Use these environment variables while developing:
-
-- `client/.env`: `VITE_API_URL=http://localhost:5002/api`
-- `server/.env`: `PORT`, `MONGO_URI`, `JWT_SECRET`, `ALLOWED_ORIGINS`, `NODE_ENV`
-
-## Deployment
-
-### Option 1: Single deployment for API + frontend
-
-Build the client, then run the server:
-
-```bash
-cd client
-npm install
-npm run build
-
-cd ../server
-npm install
-npm start
-```
-
-Recommended production env:
-
-- Server:
-  - `NODE_ENV=production`
-  - `PORT=<platform port>`
-  - `MONGO_URI=<your mongo connection string>`
-  - `JWT_SECRET=<strong secret>`
-  - `ALLOWED_ORIGINS=https://your-frontend-domain.com`
-- Client:
-  - Leave `VITE_API_URL` unset to use same-origin `/api`, or set `VITE_API_URL=/api`
-
-### Option 2: Separate frontend and backend deployments
-
-- Deploy `server/` as the API service
-- Deploy `client/` as the frontend service
-- Set `client` env `VITE_API_URL=https://your-api-domain.com/api`
-- Set `server` env `ALLOWED_ORIGINS=https://your-frontend-domain.com`
-
-## Production checks
-
-- `GET /api/health` returns server health info for uptime checks
-- Unknown API routes return JSON 404 responses
-- The server validates required env vars on startup
-- CORS is controlled by `ALLOWED_ORIGINS`
->>>>>>> 83fd36d (fix 404)
+The tests use `mongodb-memory-server`; no external database is needed.
