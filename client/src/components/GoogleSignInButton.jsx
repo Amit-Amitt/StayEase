@@ -21,9 +21,13 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
     }
 
     let active = true;
-    const container = containerRef.current;
+    
+    // 1. Snapshot the ref's current value to a local variable
+    const currentContainer = containerRef.current;
+
     const renderButton = () => {
-      if (!active || !container || !window.google?.accounts?.id) return;
+      // 2. Use the local variable snapshot inside the function
+      if (!active || !currentContainer || !window.google?.accounts?.id) return;
       setLoadError('');
       window.google.accounts.id.initialize({
         client_id: clientId,
@@ -32,14 +36,14 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
           else onErrorRef.current?.('Google did not return a sign-in credential. Try again.');
         },
       });
-      container.replaceChildren();
-      window.google.accounts.id.renderButton(container, {
+      currentContainer.replaceChildren();
+      window.google.accounts.id.renderButton(currentContainer, {
         type: 'standard',
         theme: 'outline',
         size: 'large',
         text,
         shape: 'rectangular',
-        width: Math.min(container.clientWidth || 400, 400),
+        width: Math.min(currentContainer.clientWidth || 400, 400),
         logo_alignment: 'left',
       });
     };
@@ -70,7 +74,9 @@ export const GoogleSignInButton = ({ onCredential, onError, text = 'continue_wit
       const currentScript = document.getElementById(GOOGLE_SCRIPT_ID);
       currentScript?.removeEventListener('load', renderButton);
       currentScript?.removeEventListener('error', handleScriptError);
-      container?.replaceChildren();
+      
+      // 3. Safely clean up using the trapped local reference
+      currentContainer?.replaceChildren();
     };
   }, [clientId, text]);
 
